@@ -1,0 +1,104 @@
+body, h1, h2,
+p, div, ol, li,
+pre, dl, dd, dt {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: white;
+    background: url("bg.png");
+    color: #111111;
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, sans-serif;
+    font-size: 93.75%; /* 15px */
+}
+
+h1, h2 {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, sans-serif;
+    font-weighte: bold;
+    margin-bottom: 0.7em;
+    font-size: 100%;
+}
+
+h1 {
+    background-color: #404853;
+    color: #eee;
+    padding: 1em 0;
+    border-bottom: 1px solid black;
+    text-align: center;
+    font-size: 1.6em;
+}
+
+h2 {
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid #dddddd;
+    color: #404853;
+    font-size: 1.4em;
+}
+
+a {
+    color: #c50000;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+p, dl, pre {
+    margin-bottom: 1em;
+}
+
+code, pre {
+    font-family: "Monaco", "Courier New", monospace;
+}
+
+code {
+    background-color: #ddd;
+}
+
+pre {
+    padding: 0.5em 2em;
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+    background-color: #e5e5e5;
+}
+
+dd {
+    margin: 0 0 1em 2em;
+}
+
+.layout {
+    width: 650px;
+    margin: 0 auto;
+    line-height: 1.3em;
+}
+
+.clear {
+    clear: both;
+}
+
+.info-sheet {
+    width: 70%;
+    margin: 0 auto;
+}
+
+.info-sheet dl {
+    float: left;
+    clear: both;
+    padding: 0.3em;
+}
+
+.info-sheet dt {
+    float: left;
+    clear: left;
+    width: 10em;
+    text-align: right;
+    font-weight: bold;
+}
+
+.info-sheet dd {
+    float: left;
+    margin: 0;
+    padding-left: 0.5em;
+}
