@@ -9,12 +9,11 @@ body {
     background-color: white;
     background: url("bg.png");
     color: #111111;
-    font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, sans-serif;
+    font-family: "Open Sans", "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, sans-serif;
     font-size: 93.75%; /* 15px */
 }
 
 h1, h2 {
-    font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, sans-serif;
     font-weighte: bold;
     margin-bottom: 0.7em;
     font-size: 100%;
