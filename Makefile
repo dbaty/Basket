@@ -17,7 +17,7 @@ _default:
 .PHONY: clean
 clean:
 	rm -rf .coverage
-	rm -rf ./dist/
+	rm -rf ./dist/ ./build
 	rm -rf $(tmp_dir)
 	find . -name "*.pyc" | xargs rm
 
@@ -50,8 +50,8 @@ distcheck: clean dist
 
 .PHONY:	qa
 qa:
-	pep8 -r setup.py
-	pep8 -r $(package_name)
+	pep8 -r setup.py || true
+	pep8 -r $(package_name) || true
 	pyflakes setup.py
 	pyflakes $(package_name)
 
