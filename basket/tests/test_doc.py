@@ -8,10 +8,10 @@ def test_docs():
     here = os.path.dirname(__file__)
     basket_root = os.path.join(here, '.basket-test')
     os.environ['BASKET_ROOT'] = basket_root
-    readme_path = os.path.join(here, '..', '..', 'README.rst')
+    doc_path = os.path.join(here, 'usage.rst')
     try:
-        with open(readme_path) as readme:
-            for session in find_shell_sessions(readme):
+        with open(doc_path) as doc:
+            for session in find_shell_sessions(doc):
                 # Ignore 'pip' and 'easy_install' command that would
                 # install packages in our development environment.
                 if session.cmd.startswith(('pip', 'easy_install')):
