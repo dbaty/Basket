@@ -98,12 +98,20 @@ class Basket(object):
         """Open the ``requires.txt`` file from the given TAR-gzipped
         archive.
         """
-        with tarfile.open(path, 'r:gz') as archive:
-            for info in archive:
-                if info.name.endswith(
-                    os.path.join('.egg-info', 'requires.txt')):
-                    return archive.extractfile(info).readlines()
-        return ()
+        extension = os.path.splitext(path)[1]
+        if extension == '.gz': 
+            with tarfile.open(path, 'r:gz') as archive:
+                for info in archive:
+                    if info.name.endswith(
+                        os.path.join('.egg-info', 'requires.txt')):
+                        return archive.extractfile(info).readlines()                    
+        elif extension == '.bz2':
+            with tarfile.open(path, 'r:bz2') as archive:
+                for info in archive:
+                    if info.name.endswith(
+                        os.path.join('.egg-info', 'requires.txt')):
+                        return archive.extractfile(info).readlines()            
+        return ()  
 
     def _open_req_in_zip_archive(self, path):
         """Open the ``requires.txt`` file from the given zipped
