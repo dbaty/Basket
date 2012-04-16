@@ -34,3 +34,5 @@ class TestGetNameAndVersion(TestCase):
                          {'name': 'foo', 'version': '1.2'})
         self.assertEqual(self.call_fut('foo-bar-1.2.zip'),
                          {'name': 'foo-bar', 'version': '1.2'})
+        self.assertEqual(self.call_fut('foo-bar-1.2.tar.bz2'),
+                         {'name': 'foo-bar', 'version': '1.2'})

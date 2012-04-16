@@ -30,7 +30,9 @@ def get_name_and_version(filename):
     if idx == -1:
         idx = filename.rfind('.zip')
         if idx == -1:
-            idx = filename.rfind('.')
+            idx = filename.rfind('.tar.bz2')
+            if idx == -1:
+                idx = filename.rfind('.')
     name, version = filename[:idx].rsplit('-', 1)
     return {'name': name, 'version': version}
 
@@ -96,9 +98,10 @@ class Basket(object):
 
     def _open_req_in_tar_archive(self, path):
         """Open the ``requires.txt`` file from the given TAR-gzipped
-        archive.
+        or TAR-bzipped archive.
         """
-        with tarfile.open(path, 'r:gz') as archive:
+        extension = os.path.splitext(path)[1].split('.')[1]
+        with tarfile.open(path, 'r:%s' % extension) as archive:
             for info in archive:
                 if info.name.endswith(
                     os.path.join('.egg-info', 'requires.txt')):
