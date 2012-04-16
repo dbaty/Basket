@@ -48,6 +48,10 @@ distcheck: clean dist
 		$(tmp_env_dir)/bin/python setup.py install && \
 		$(tmp_env_dir)/bin/nosetests
 
+.PHONY: upload
+upload:
+	python setup.py sdist upload
+
 .PHONY:	qa
 qa:
 	pep8 -r setup.py || true
