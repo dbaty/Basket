@@ -230,5 +230,5 @@ Meta
 Basket is hosted on GitHub: `<https://github.com/dbaty/basket>`_. Feel
 free to report bugs and contribute there.
 
-Basket is written by Damien Baty and is licenced under the 3-clause
+Basket is written by Damien Baty and is licensed under the 3-clause
 BSD license, a copy of which is included in the source.
