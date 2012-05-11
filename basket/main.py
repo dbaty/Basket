@@ -268,7 +268,7 @@ class Basket(object):
     def cmd_update(self, packages=()):
         """Check whether we have the latest version of the requested
         packages (or all downloaded ones if ``packages`` is not given)
-        and download it it we do not.
+        and download it if we do not.
 
         If a new version is downloaded, the old version is kept. This
         is a feature.
