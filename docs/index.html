@@ -46,11 +46,9 @@
     </p>
 
     <h2>Usage</h2>
-    
     <p>
-      You need Python 2.7 to run Basket. It may work with prior
-      versions of Python 2 and/or Python 3 but this has not been
-      tested (yet).
+      You need Python 2.7 or Python 3.2 to run Basket. It may work
+      with other versions but this has not been tested.
     </p>
 
     <ol>
@@ -79,10 +77,10 @@ Repository has been created: ~/.basket</pre>
       <li>
         <p>Download one or more packages:</p>
         <pre>
-$ basket download docutils
-Added docutils 0.8.1.
+$ basket download unittest2
+Added unittest2 0.5.1.
 $ basket download nose coverage
-Added coverage 3.5.1.
+Added coverage 3.5.2.
 Added nose 1.1.2.</pre>
         <p>
           Basket searches for the name of the package so the case does
@@ -101,37 +99,32 @@ Added MySQL-python 1.2.3.</pre>
         </p>
         <p>Basket also downloads requirements:</p>
         <pre>
-$ basket download sphinx
-Added Sphinx 1.1.2.
-  -&gt; requires: Pygments, Jinja2, docutils
-Added Pygments 1.4.
+$ basket download Jinja2
 Added Jinja2 2.6.
   -&gt; requires: Babel
-docutils is already up to date (0.8.1).
 Added Babel 0.9.6.</pre>
         <p>
           See the <a href="#limitations-and-features">Limitations and
-          features</a> section below for further details about how
-          Basket handle requirements.</p>
+          features</a> section below for further details about which
+          packages can be downloaded and how Basket handle
+          requirements.</p>
       </li>
       <li>
         <p>List all downloaded packages:</p>
         <pre>
 $ basket list
 Babel 0.9.6
-coverage 3.5.1
-docutils 0.8.1
+coverage 3.5.2
 Jinja2 2.6
 MySQL-python 1.2.3
 nose 1.1.2
-Pygments 1.4
-Sphinx 1.1.2</pre>
+unittest2 0.5.1</pre>
         <p>Or only one or more specific packages:</p>
         <pre>
-$ basket list docutils
-docutils 0.8.1
+$ basket list nose
+nose 1.1.2
 $ basket list nose coverage
-coverage 3.5.1
+coverage 3.5.2
 nose 1.1.2</pre>
       </li>
       <li>
@@ -141,39 +134,39 @@ nose 1.1.2</pre>
           package if you do not have it already:
         </p>
         <pre>
-$ basket update docutils
-docutils is already up to date (0.8.1).</pre>
+$ basket update nose
+nose is already up to date (1.1.2).</pre>
         <p>
           Ok, we have the latest versions. Let's mess with the
           repository to make it think that we actually have an old
-          version of <code>docutils</code>:
+          version of <code>nose</code>:
         </p>
         <pre>
-$ mv ~/.basket/docutils-0.8.1.tar.gz ~/.basket/docutils-0.7.tar.gz
-$ basket list docutils
-docutils 0.7</pre>
+$ mv ~/.basket/nose-1.1.2.tar.gz ~/.basket/nose-1.1.1.tar.gz
+$ basket list nose
+nose 1.1.1</pre>
         <p>And ask again:</p>
         <pre>
-$ basket update docutils
-Added docutils 0.8.1.</pre>
+$ basket update nose
+Added nose 1.1.2.</pre>
         <p>
           As indicated above for the <code>download</code> command,
           old versions are kept alongside the latest one. This is a
           feature.
         </p>
         <pre>
-$ basket list docutils
-docutils 0.7
-docutils 0.8.1</pre>
+$ basket list nose
+nose 1.1.1
+nose 1.1.2</pre>
         <p>
           You may update only a particular package or a set of
           packages:
         </p>
         <pre>
-$ basket update Sphinx
-Sphinx is already up to date (1.1.2).
+$ basket update Jinja2
+Jinja2 is already up to date (2.6).
 $ basket update nose coverage
-coverage is already up to date (3.5.1).
+coverage is already up to date (3.5.2).
 nose is already up to date (1.1.2).</pre>
         <p>
           Usually, though, you would ask for an update of all
@@ -182,13 +175,11 @@ nose is already up to date (1.1.2).</pre>
         <pre>
 $ basket update
 Babel is already up to date (0.9.6).
-coverage is already up to date (3.5.1).
-docutils is already up to date (0.8.1).
+coverage is already up to date (3.5.2).
 Jinja2 is already up to date (2.6).
 MySQL-python is already up to date (1.2.3).
 nose is already up to date (1.1.2).
-Pygments is already up to date (1.4).
-Sphinx is already up to date (1.1.2).</pre>
+unittest2 is already up to date (0.5.1).</pre>
       </li>
       <li>
         <p>
@@ -196,22 +187,22 @@ Sphinx is already up to date (1.1.2).</pre>
           use the <code>prune</code> command:
         </p>
         <pre>
-$ basket list docutils
-docutils 0.7
-docutils 0.8.1
-$ basket prune docutils
-Removed docutils 0.7 (kept 0.8.1).</pre>
+$ basket list nose
+nose 1.1.1
+nose 1.1.2
+$ basket prune nose
+Removed nose 1.1.1 (kept 1.1.2).
+$ basket list nose
+nose 1.1.2</pre>
         <p>You may do the same thing on all downloaded packages:</p>
         <pre>
 $ basket prune
 Babel has only one version. Nothing to prune.
 coverage has only one version. Nothing to prune.
-docutils has only one version. Nothing to prune.
 Jinja2 has only one version. Nothing to prune.
 MySQL-python has only one version. Nothing to prune.
 nose has only one version. Nothing to prune.
-Pygments has only one version. Nothing to prune.
-Sphinx has only one version. Nothing to prune.</pre>
+unittest2 has only one version. Nothing to prune.</pre>
         <p>
           Of course, it would be wiser to update downloaded packages
           before pruning anything. Otherwise, you may end up keeping
@@ -271,9 +262,18 @@ $ pip install --no-index -f file:///path/to/.basket pyramid</pre>
       cause issues for certain packages on certain platforms.
     </p>
     <p>
+      Basket cannot download packages that are not hosted on
+      PyPI. Note that a package may appear on PyPI while its files are
+      hosted somewhere else. In this case, <code>easy_install</code>
+      and <code>pip</code> go a long way to find the files (by
+      following links and parsing HTML pages). Basket, on the other
+      hand, does not do that and act as if the package was not on
+      PyPI.
+    </p>
+    <p>
       When looking at requirements, Basket only cares about the name
       of the package, ignoring any particular version requirements
-      (e.g. "docutils&gt;=0.8.1") and thus always downloading the
+      (e.g. "nose&gt;=1.1.2") and thus always downloading the
       latest version. This may be a problem for packages that
       explictly require a version that is not the latest.
     </p>
@@ -288,11 +288,27 @@ $ pip install --no-index -f file:///path/to/.basket pyramid</pre>
       free to report bugs and contribute there.
     </p>
     <p>
+      Tests may be run with <a href="http://tox.testrun.org/">Tox</a>,
+      which has to be installed first. Unit and integration tests may
+      be run with the <code>tox</code> command. Functional tests are a
+      lot slower (more than 30 seconds for each Python version) and must
+      be run explicitly with <code>tox&nbsp;-e&nbsp;py27-functional</code>
+      and <code>tox&nbsp;-e&nbsp;py32-functional</code>.
+    </p>
+    <p>
       Basket is written by Damien Baty and is licensed under the
       <a href="https://raw.github.com/dbaty/basket/master/LICENSE.txt">3-clause BSD license</a>.
     </p>
 
     <h2>Changes</h2>
+    <h3>1.0 (2012-05-14)</h3>
+    <ul>
+      <li>added support for Python 3;</li>
+      <li>
+        fixed a bug in the "prune" command that could cause Basket to
+        prune the wrong version(s).
+      </li>
+    </ul>
     <h3>0.9 (2012-04-16)</h3>
     <ul>
       <li>

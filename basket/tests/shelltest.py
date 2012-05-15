@@ -14,6 +14,9 @@ import os
 import subprocess
 
 
+PY3 = bytes is not str
+
+
 def find_shell_sessions(stream):
     cmd = None
     expected_output = []
@@ -59,7 +62,7 @@ class ShellSession(object):
     __repr__ = __str__
 
     def __unicode__(self):
-        return u'<ShellSession($ %s) at l.%d>' % (self.cmd, self.line_no)
+        return '<ShellSession($ %s) at l.%d>' % (self.cmd, self.line_no)
 
     def replace(self, s, replacement):
         self.cmd = self.cmd.replace(s, replacement)
@@ -89,6 +92,8 @@ class ShellSession(object):
                 if not line:
                     break
                 output.append(line)
+        if PY3:
+            output = [str(line, 'utf-8') for line in output]
         # FIXME: review this function
         output = fix_trailing_space(''.join(output))
         context = os.linesep.join(('Command: %s' % self.cmd.rstrip(),

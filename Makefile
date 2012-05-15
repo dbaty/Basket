@@ -61,4 +61,4 @@ qa:
 
 .PHONY: test
 test:
-	PYTHONWARNINGS=all nosetests
+	@PYTHONWARNINGS=all nosetests

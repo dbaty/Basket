@@ -2,9 +2,11 @@ import collections
 import os
 import sys
 import tarfile
-import urllib
-import xmlrpclib
 import zipfile
+
+from basket.compat import urllib
+from basket.compat import xmlrpclib
+from basket.compat import text
 
 
 PYPI_ENDPOINT = 'http://pypi.python.org/pypi'
@@ -39,8 +41,13 @@ def get_name_and_version(filename):
 
 class Basket(object):
 
-    # Defined here so we can customize it for our tests. When we have
-    # tests...
+    # Defined here so we can mock them for our tests. This is just a
+    # try and I might end up using a mocking library instead if it
+    # gets out of control.
+    os = os
+    tarfile = tarfile
+    urllib = urllib
+    zipfile = zipfile
     err = sys.stderr
     out = sys.stdout
     root = os.environ.get('BASKET_ROOT') or os.path.expanduser('~/.basket')
@@ -62,7 +69,7 @@ class Basket(object):
         """Return information about downloaded packages."""
         if getattr(self, '_downloaded_packages', None) is None:
             self._downloaded_packages = []
-            for filename in os.listdir(self.root):
+            for filename in self.os.listdir(self.root):
                 info = get_name_and_version(filename)
                 info['filename'] = filename
                 self._downloaded_packages.append(info)
@@ -96,27 +103,27 @@ class Basket(object):
                 return info['url']
         return None
 
-    def _open_req_in_tar_archive(self, path):
-        """Open the ``requires.txt`` file from the given TAR-gzipped
-        or TAR-bzipped archive.
+    def _get_requirements_from_tar_archive(self, path):
+        """Return lines of ``requires.txt`` file from the given
+        TAR-gzipped or TAR-bzipped archive.
         """
-        extension = os.path.splitext(path)[1].split('.')[1]
-        with tarfile.open(path, 'r:%s' % extension) as archive:
+        extension = self.os.path.splitext(path)[1].split('.')[1]
+        with self.tarfile.open(path, 'r:%s' % extension) as archive:
             for info in archive:
                 if info.name.endswith(
-                    os.path.join('.egg-info', 'requires.txt')):
-                    return archive.extractfile(info).readlines()
+                    self.os.path.join('.egg-info', 'requires.txt')):
+                    return map(text, archive.extractfile(info).readlines())
         return ()
 
-    def _open_req_in_zip_archive(self, path):
-        """Open the ``requires.txt`` file from the given zipped
+    def _get_requirements_from_zip_archive(self, path):
+        """Return lines of ``requires.txt`` file from the given zipped
         archive.
         """
-        with zipfile.ZipFile(path) as archive:
+        with self.zipfile.ZipFile(path) as archive:
             for info in archive.infolist():
                 if info.filename.endswith(
-                    os.path.join('.egg-info', 'requires.txt')):
-                    return archive.open(info).readlines()
+                    self.os.path.join('.egg-info', 'requires.txt')):
+                    return map(text, archive.open(info).readlines())
         return ()
 
     def _find_requirements(self, path):
@@ -135,10 +142,10 @@ class Basket(object):
           thing, though).
         """
         requirements = []
-        if tarfile.is_tarfile(path):
-            lines = self._open_req_in_tar_archive(path)
-        elif zipfile.is_zipfile(path):
-            lines = self._open_req_in_zip_archive(path)
+        if self.tarfile.is_tarfile(path):
+            lines = self._get_requirements_from_tar_archive(path)
+        elif self.zipfile.is_zipfile(path):
+            lines = self._get_requirements_from_zip_archive(path)
         else:
             self.print_err('Could not open "%s" (unknown archive '
                            'format).' % path)
@@ -157,8 +164,8 @@ class Basket(object):
 
     def _download(self, package, version, url):
         self.downloaded_packages.append({'name': package, 'version': version})
-        path = os.path.join(self.root, url[url.rfind('/') + 1:])
-        urllib.urlretrieve(url, path)
+        path = self.os.path.join(self.root, url[url.rfind('/') + 1:])
+        self.urllib.urlretrieve(url, path)
         return path
 
     def print_msg(self, msg):
@@ -175,11 +182,11 @@ class Basket(object):
 
     def cmd_init(self):
         """Initialize Basket directory."""
-        if os.path.exists(self.root):
+        if self.os.path.exists(self.root):
             self.print_err('A file or directory already exists '
                            'at "%s".' % self.root)
             return 1
-        os.makedirs(self.root)
+        self.os.makedirs(self.root)
         self.print_msg('Repository has been created: %s' % self.root)
         return 0
 
@@ -201,6 +208,7 @@ class Basket(object):
         for name in left:
             self.print_err('Package "%s" is not installed (or it is '
                            'there but you mistyped the package name).' % name)
+        return 0
 
     def cmd_download(self, packages):
         """Download requested packages (if we do not have the latest
@@ -214,15 +222,15 @@ class Basket(object):
                 self.print_err(
                     'Could not find any package named "%s".' % package)
                 continue
+            if self._has_package(info['name'], info['version']):
+                self.print_msg(
+                    '%(name)s is already up to date (%(version)s).' % info)
+                continue
             url = self._find_package_url(info['name'], info['version'])
             if url is None:
                 self.print_err(
                     'Could not find a suitable distribution for '
                     '%(name)s %(version)s.' % info)
-                continue
-            if self._has_package(info['name'], info['version']):
-                self.print_msg(
-                    '%(name)s is already up to date (%(version)s).' % info)
                 continue
             path = self._download(info['name'], info['version'], url)
             self.print_msg('Added %(name)s %(version)s.' % info)
@@ -254,10 +262,10 @@ class Basket(object):
             if not prune_all:
                 left.remove(name)
             versions = downloaded[name]
-            sorted(versions, key=lambda info: info['version'])
+            versions = sorted(versions, key=lambda info: info['version'])
             latest = versions[-1]['version']
-            for filename in [info['filename'] for info in versions[:-1]]:
-                os.remove(os.path.join(self.root, filename))
+            for info in versions[:-1]:
+                self.os.remove(self.os.path.join(self.root, info['filename']))
                 self.print_msg('Removed %s %s (kept %s).' % (
                         info['name'], info['version'], latest))
         for name in left:
