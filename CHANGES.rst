@@ -4,9 +4,9 @@ List of releases of Basket
 1.0 (2012-05-14)
 ----------------
 
-- added support for Python 3;
+- add support for Python 3;
 
-- fixed a bug in 'prune' command that could cause Basket to prune the
+- fix a bug in 'prune' command that could cause Basket to prune the
   wrong version(s).
 
 
