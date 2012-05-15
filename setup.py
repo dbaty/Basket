@@ -11,7 +11,7 @@ DESCRIPTION = README
 REQUIRES = ()
 
 setup(name='Basket',
-      version='0.9',
+      version='1.0',
       description='A local static PyPI repository builder',
       long_description='\n\n'.join((README, CHANGES)),
       classifiers=(
