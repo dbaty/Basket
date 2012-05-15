@@ -94,8 +94,7 @@ class ShellSession(object):
                 output.append(line)
         if PY3:
             output = [str(line, 'utf-8') for line in output]
-        # FIXME: review this function
-        output = fix_trailing_space(''.join(output))
+        output = ''.join(output)
         context = os.linesep.join(('Command: %s' % self.cmd.rstrip(),
                                    'Line: %d' % self.line_no,
                                    'Working dir: %s' % os.getcwd()))
@@ -105,17 +104,3 @@ class ShellSession(object):
             diff = diff[2:]  # remove filenames
         error = os.linesep.join((context, os.linesep.join(diff)))
         assert output == ''.join(self.expected_output), error
-
-
-def fix_trailing_space(s):
-    if s == '':
-        return s
-    if s[-1] == os.linesep:
-        return s
-    chop_at = len(s) - 1
-    while chop_at > 0:
-        if s[chop_at] in (' ', '\t'):
-            chop_at -= 1
-        else:
-            break
-    return s[:chop_at + 1]
