@@ -75,6 +75,27 @@ class Basket(object):
                 self._downloaded_packages.append(info)
         return self._downloaded_packages
 
+    def _find_package_version(self, query):
+        """Return information about the package that matches the
+        query (case does not matter).
+
+        PyPI may return more than one version of a package (e.g. when
+        there are multiple concurrent stable releases). In this case,
+        we return the latest one.
+        """
+        query = query.lower()
+        package, version = query.split("==")
+
+        candidates = []
+
+        for info in self.client.search({'name': package, 'version' : version}):
+            if info['name'].lower() == package and info['version'] == version:
+                candidates.append(info)
+        if not candidates:
+            return None
+        return sorted(candidates, key=lambda info: info['version'])[-1]
+
+
     def _find_package_name(self, query):
         """Return information about the package that matches the
         query (case does not matter).
@@ -85,6 +106,7 @@ class Basket(object):
         """
         query = query.lower()
         candidates = []
+
         for info in self.client.search({'name': query}):
             if info['name'].lower() == query:
                 candidates.append(info)
@@ -217,7 +239,10 @@ class Basket(object):
         self.packages = collections.deque(packages)
         while self.packages:
             package = self.packages.pop()
-            info = self._find_package_name(package)
+            if "==" in package:
+                info = self._find_package_version(package)
+            else:
+                info = self._find_package_name(package)
             if info is None:
                 self.print_err(
                     'Could not find any package named "%s".' % package)
@@ -335,6 +360,11 @@ def main(argv=sys.argv, _basket_class=Basket):
     if command == 'download':
         if len(argv) < 1:
             return basket.syntax_error('download')
+        if "-r" in argv:
+            file_name = argv.pop(1)
+            f = open(file_name, 'r')
+            lines = [i.rstrip() for i in f.readlines()]
+            return basket.cmd_download(lines)
         return basket.cmd_download(argv)
     if command == 'init':
         if len(argv) != 0:
@@ -351,3 +381,4 @@ def main(argv=sys.argv, _basket_class=Basket):
 
 if __name__ == '__main__':
     main()
+

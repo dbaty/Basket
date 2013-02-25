@@ -67,6 +67,22 @@ class TestBasket(TestCase):
                      'version': '1.0'}]
         self.assertEqual(basket.downloaded_packages, expected)
 
+    def test_download_packages_from_requiremnts(self):
+        basket = self._make_one()
+        class FakeOs(object):
+            def __init__(self, subdirs):
+                self.subdirs = subdirs
+            def listdir(self, dir):
+                return self.subdirs
+        basket.os = FakeOs(['Foo-1.2.tar.gz', 'Bar-1.0.tar.bz2'])
+        expected = [{'filename': 'Foo-1.2.tar.gz',
+                     'name': 'Foo',
+                     'version': '1.2'},
+                    {'filename': 'Bar-1.0.tar.bz2',
+                     'name': 'Bar',
+                     'version': '1.0'}]
+        self.assertEqual(basket.downloaded_packages, expected)
+
     def test_find_package_name(self):
         basket = self._make_one()
         results = [{'name': 'Foosomething', 'version': '1.0'},
