@@ -37,3 +37,4 @@ setup(name='Basket',
       [console_scripts]
       basket = basket.main:main
       ''')
+
