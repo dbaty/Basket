@@ -50,7 +50,13 @@ class Basket(object):
     zipfile = zipfile
     err = sys.stderr
     out = sys.stdout
-    root = os.environ.get('BASKET_ROOT') or os.path.expanduser('~/.basket')
+    root = os.environ.get('BASKET_ROOT')
+
+    if not root:
+        root = os.path.expanduser('~/.basket')
+        os.environ['BASKET_ROOT'] = root
+        if not os.path.exists(root):
+            os.makedirs(root)
 
     @property
     def client(self):
