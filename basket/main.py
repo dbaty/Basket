@@ -84,6 +84,7 @@ class Basket(object):
         we return the latest one.
         """
         query = query.lower()
+        query = query.split()[0]
         candidates = []
         for info in self.client.search({'name': query}):
             if info['name'].lower() == query:
