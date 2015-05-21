@@ -1,6 +1,7 @@
 import collections
 import os
 import sys
+import re
 import tarfile
 import zipfile
 
