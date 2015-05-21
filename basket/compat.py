@@ -2,7 +2,7 @@
 
 import sys
 try:
-    from urllib import request as urllib
+    from urllib import request as urllib2
 except:
     # Python 2
     import urllib2
