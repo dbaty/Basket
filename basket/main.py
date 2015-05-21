@@ -4,7 +4,7 @@ import sys
 import tarfile
 import zipfile
 
-from basket.compat import urllib
+from basket.compat import urllib2
 from basket.compat import xmlrpclib
 from basket.compat import text
 
