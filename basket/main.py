@@ -4,6 +4,8 @@ import sys
 import tarfile
 import zipfile
 
+from contextlib import closing
+
 from basket.compat import urllib2
 from basket.compat import xmlrpclib
 from basket.compat import text
