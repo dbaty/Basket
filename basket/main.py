@@ -38,6 +38,28 @@ def get_name_and_version(filename):
     name, version = filename[:idx].rsplit('-', 1)
     return {'name': name, 'version': version}
 
+# Create a transport to handle requests behind the proxy
+#
+class ProxiedTransport(xmlrpclib.Transport):
+    user_agent = 'Basket'
+
+    def set_proxy(self, proxy):
+        self.proxy = proxy
+
+    def make_connection(self, host):
+        self.realhost = host
+        import httplib
+        return httplib.HTTP(self.proxy)
+
+    def send_request(self, connection, handler, request_body):
+        connection.putrequest("POST", 'http://%s%s' % (self.realhost, handler))
+
+    def send_host(self, connection, host):
+        connection.putheader('Host', self.realhost)
+
+    def __init__(self, proxy, use_datetime = 0):
+        xmlrpclib.Transport.__init__(self, use_datetime)
+        self.set_proxy(proxy)
 
 class Basket(object):
 
@@ -46,11 +68,25 @@ class Basket(object):
     # gets out of control.
     os = os
     tarfile = tarfile
-    urllib = urllib
+    urllib = urllib2
     zipfile = zipfile
     err = sys.stderr
     out = sys.stdout
     root = os.environ.get('BASKET_ROOT') or os.path.expanduser('~/.basket')
+
+    # Support http_proxy environment
+    # because of usage xmlrpclib and urllib we need to support both mechanisms
+    if os.environ.get('http_proxy'):
+        # Extract http_proxy from environment
+        proxy = ''.join(re.findall(r'[\d\.]+:?', os.environ.get('http_proxy')))
+
+        # Setup proxy for both: xmlrpclib and urllib2
+        transport = ProxiedTransport(proxy)
+        proxy_support = urllib2.ProxyHandler({'https': proxy })
+        opener = urllib2.build_opener(proxy_support, urllib2.HTTPHandler)
+        urllib2.install_opener(opener)
+    else:
+        transport = None
 
     @property
     def client(self):
@@ -108,7 +144,7 @@ class Basket(object):
         TAR-gzipped or TAR-bzipped archive.
         """
         extension = self.os.path.splitext(path)[1].split('.')[1]
-        with self.tarfile.open(path, 'r:%s' % extension) as archive:
+        with closing(self.tarfile.open(path, 'r:%s' % extension)) as archive:
             for info in archive:
                 if info.name.endswith(
                     self.os.path.join('.egg-info', 'requires.txt')):
@@ -119,7 +155,7 @@ class Basket(object):
         """Return lines of ``requires.txt`` file from the given zipped
         archive.
         """
-        with self.zipfile.ZipFile(path) as archive:
+        with closing(self.zipfile.ZipFile(path)) as archive:
             for info in archive.infolist():
                 if info.filename.endswith(
                     self.os.path.join('.egg-info', 'requires.txt')):
@@ -165,7 +201,11 @@ class Basket(object):
     def _download(self, package, version, url):
         self.downloaded_packages.append({'name': package, 'version': version})
         path = self.os.path.join(self.root, url[url.rfind('/') + 1:])
-        self.urllib.urlretrieve(url, path)
+        #self.urllib.urlretrieve(url, path)
+        file = self.urllib.urlopen(url)
+        out_save = open(path, 'wb')
+        out_save.write(file.read())
+        out_save.close()
         return path
 
     def print_msg(self, msg):

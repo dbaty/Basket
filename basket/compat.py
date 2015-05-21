@@ -5,7 +5,7 @@ try:
     from urllib import request as urllib
 except:
     # Python 2
-    import urllib
+    import urllib2
 try:
     import xmlrpclib
 except:  # pragma: no cover
