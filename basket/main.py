@@ -100,7 +100,7 @@ class Basket(object):
         # supposes that we are looking for the '__nonzero__' RPC
         # method. Hilarity does not ensue.
         if getattr(self, '_client', None) is None:
-            self._client = xmlrpclib.ServerProxy(PYPI_ENDPOINT)
+            self._client = xmlrpclib.ServerProxy(PYPI_ENDPOINT, transport = self.transport)
         return self._client
 
     @property
