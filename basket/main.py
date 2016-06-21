@@ -9,7 +9,7 @@ from basket.compat import xmlrpclib
 from basket.compat import text
 
 
-PYPI_ENDPOINT = 'http://pypi.python.org/pypi'
+PYPI_ENDPOINT = 'https://pypi.python.org/pypi'
 
 
 def get_package_name(line):
